@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+
+
+      let clientCount = 1;
+      
+      let welcomeMessage = `Hello User: ${clientCount}`
+      
+
+      // function setUsername () {
+      //   username = $('#usernameInput').val().trim();
+      // }
+      
+      // if(username) {
+      //   $('#loginPage').fadeOut();
+      //   $('#chatPage').show();
+      //   $('#loginPage').off('click');
+      //   $('#loginPage').css('display: none');
+      // }
+
+
+
+      $(()=>{
+        const socket = io();
+        // $('.login').submit(()=>{
+        //   usernameHolder.push(username);
+        // })
+      
+        socket.emit(` Welcome User: ${clientCount}`);
+        
+        $('.chat').submit(()=> {
+             socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+      
+      socket.on('user added', () =>{
+        clientCount++;
+        $('#messages').append($('<li>').text(` User ${clientCount} has joined`));
+      })
+      socket.on('chat message', (msg) => {
+        $('#messages').append($('<li>').text(`User: ${clientCount} ` + msg));
+      });
+      socket.on('user left', ()=>{
+        clientCount--;
+        $('#messages').append($('<li>').text(`User: ${clientCount} has left`));
+      });
+    });
+    </script>
+  </head>
+  <body>
+    <div id="loginPage">
+      <form class="login" action="">
+        <h3 class="title">What is your username</h3>
+          <input id="usernameInput" autocomplete="off"/>
+          <button class="usernameSubmit">Submit</button>
+      </form>
+    </div>
+
+    <div id="chatPage">
+      <ul id="messages"></ul>
+      <form class="chat" action="">
+        <input id="m" autocomplete="off" />
+        <button>Send</button>
+      </form>
+    </div>
+  </body>
+</html>
